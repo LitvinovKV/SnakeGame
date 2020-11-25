@@ -1,18 +1,29 @@
-﻿using System.Drawing;
+﻿using SnakeGame.SnakeData;
+using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace SnakeGame
 {
     public class Game
     {
-        public int FieldWidth { get; private set; }
-        public int FieldHeight { get; private set; }
-        public Point FieldStartPos { get; private set; }
+        public Timer Timer { get; private set; }
 
-        public Game(Point fieldStartPos, int fieldWidth, int fieldHeight)
+        public Game(PictureBox field)
         {
-            FieldStartPos = fieldStartPos;
-            FieldWidth = fieldWidth;
-            FieldHeight = fieldHeight;
+            Field = field;
+
+            InitTimer();
         }
+
+        private void InitTimer()
+        {
+            Timer = new Timer();
+            Timer.Interval = 500;
+        }
+
+        private PictureBox Field { get; set; }
+        private Snake snake { get; set; }
     }
 }

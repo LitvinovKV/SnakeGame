@@ -18,7 +18,7 @@ namespace SnakeGame
         public Form1()
         {
             InitializeComponent();
-            Game = new Game(pictureBox1.Location, pictureBox1.Size.Width, pictureBox1.Height);
+            Game = new Game(pictureBox1);
         }
     }
 }

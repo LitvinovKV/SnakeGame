@@ -55,6 +55,9 @@
     <Compile Include="Game.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnakeData\Snake.cs" />
+    <Compile Include="SnakeData\SnakeHeadPart.cs" />
+    <Compile Include="SnakeData\SnakePart.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
