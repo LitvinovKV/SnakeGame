@@ -8,6 +8,9 @@ namespace SnakeGame
 {
     public class Game
     {
+        public static readonly int FIELD_WEIGHT = 20;
+        public static int FIELD_HEIGHT = 20;
+
         public Timer Timer { get; private set; }
 
         public Game(PictureBox field)

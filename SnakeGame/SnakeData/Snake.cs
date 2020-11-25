@@ -13,7 +13,7 @@ namespace SnakeGame.SnakeData
             head = new SnakeHeadPart(headX, headY);
         }
 
-        private SnakePart head { get; set; }
-        private List<SnakePart> body { get; set; }
+        public SnakeBodyPart head { get; private set; }
+        public List<SnakeBodyPart> body { get; private set; }
     }
 }

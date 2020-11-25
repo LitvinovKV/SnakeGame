@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace SnakeGame.SnakeData
 {
-    public class SnakeHeadPart : SnakePart
+    public class SnakeHeadPart : SnakeBodyPart
     {
         protected override string ImageTitle { get; set; }
 
         public SnakeHeadPart(int x, int y) : base(x, y)
         {
-            field.BackColor = Color.Blue;
+            BackColor = Color.Blue;
         }
     }
 }

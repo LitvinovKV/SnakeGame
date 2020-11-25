@@ -56,8 +56,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SnakeData\Snake.cs" />
-    <Compile Include="SnakeData\SnakeHeadPart.cs" />
-    <Compile Include="SnakeData\SnakePart.cs" />
+    <Compile Include="SnakeData\SnakeHeadPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SnakeData\SnakeBodyPart.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SnakeData\SnakePart.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
