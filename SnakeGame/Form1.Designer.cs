@@ -37,6 +37,7 @@ namespace SnakeGame
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -70,8 +71,8 @@ namespace SnakeGame
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(169, 38);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Press Space to\r\nStart/Pause Game";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.label3.Text = "Press any Row to\r\nStart Game";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pictureBox2
             // 
@@ -102,11 +103,23 @@ namespace SnakeGame
             this.label4.Size = new System.Drawing.Size(20, 20);
             this.label4.TabIndex = 5;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("MS Gothic", 14F);
+            this.label5.Location = new System.Drawing.Point(575, 110);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(179, 38);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "Press Space to\r\nPause/Resume Game";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.label3);
@@ -132,6 +145,7 @@ namespace SnakeGame
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
     }
 }
 

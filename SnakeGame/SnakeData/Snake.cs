@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace SnakeGame.SnakeData
 {
     public class Snake
     {
-        public Snake(int headX, int headY)
+        public Snake()
         {
-            head = new SnakeHeadPart(headX, headY);
+            body = new List<SnakePart>();
         }
 
-        public SnakeBodyPart head { get; private set; }
-        public List<SnakeBodyPart> body { get; private set; }
+        public Snake(int headX, int headY) : this()
+        {
+            body.Add(new SnakeHeadPart(headX, headY));
+        }
+
+        public List<SnakePart> body { get; private set; }
+        public Keys Direction { get; set; }
     }
 }
