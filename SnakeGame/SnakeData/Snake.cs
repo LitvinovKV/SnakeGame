@@ -5,17 +5,22 @@ namespace SnakeGame.SnakeData
 {
     public class Snake
     {
+        public static readonly int SPEED = 10;
+
+        public Keys Direction { get; set; }
+        public SnakeHeadPart Head { get; private set; }
+
         public Snake()
         {
-            body = new List<SnakePart>();
+            Body = new Stack<SnakePart>();
         }
 
         public Snake(int headX, int headY) : this()
         {
-            body.Add(new SnakeHeadPart(headX, headY));
+            Head = new SnakeHeadPart(headX, headY);
+            Body.Push(Head);
         }
 
-        public List<SnakePart> body { get; private set; }
-        public Keys Direction { get; set; }
+        private Stack<SnakePart> Body { get; set; }
     }
 }

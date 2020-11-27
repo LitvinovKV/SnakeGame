@@ -9,19 +9,19 @@ namespace SnakeGame
     public class Game
     {
         public static readonly int FIELD_WEIGHT = 20;
-        public static int FIELD_HEIGHT = 20;
+        public static readonly int FIELD_HEIGHT = 20;
 
         public Timer Timer { get; private set; }
 
-        public Game(PictureBox field)
+        public GameField GameField { get; }
+
+        public Game(int fieldX, int fieldY)
         {
             isStarted = false;
-            onPause = true;
-            this.field = field;
-            snake = new Snake((this.field.Location.X + this.field.Width) / 2, (this.field.Location.Y + this.field.Height) / 2);
+            this.GameField = new GameField(fieldX, fieldY);
+            snake = new Snake((GameField.Field.Location.X + GameField.Field.Width) / 2, (GameField.Field.Location.Y + GameField.Field.Height) / 2);
 
-            // Под вопросом. Как будут отображать и добовлять элементы на игровое поле
-            AddElementOnField(snake.body[0]);
+            GameField.AddElement(snake.Head);
 
             InitTimer();
         }
@@ -42,6 +42,11 @@ namespace SnakeGame
                 StartGame();
             }
 
+            if (!Timer.Enabled)
+            {
+                return;
+            }
+
             snake.Direction = key;
         }
 
@@ -49,14 +54,10 @@ namespace SnakeGame
         {
             Debug.WriteLine("SPACE KEY CLICKED!");
 
-            onPause = !onPause & isStarted;
-            Timer.Enabled = onPause;
+            Timer.Enabled = !Timer.Enabled & isStarted;
             
-            Debug.WriteLine("GAME " + (onPause ? "PAUSED" : "RESUMED"));
+            Debug.WriteLine("GAME " + (Timer.Enabled ? "PAUSED" : "RESUMED"));
         }
-
-        private void AddElementOnField(Control element)
-            => field.Controls.Add(element);
         
         private void StartGame()
         {
@@ -67,13 +68,52 @@ namespace SnakeGame
 
         private void MoveSnake(object sender, EventArgs e)
         {
-            var oldPoint = snake.body[0].Location;
-            snake.body[0].Location = new Point(oldPoint.X += 10, oldPoint.Y);
+            var oldPoint = snake.Head.Location;
+         
+            if (snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
+            {
+                snake.Head.Location = new Point(oldPoint.X, GameField.FIELD_HEIGHT - FIELD_HEIGHT);
+                return;
+            }
+
+            if (snake.Direction == Keys.Up && GameField.IsOutOfUpSide(snake.Head))
+            {
+                snake.Head.Location = new Point(oldPoint.X, 0);
+                return;
+            }
+
+            if (snake.Direction == Keys.Left && GameField.IsOutOfLeftSide(snake.Head))
+            {
+                snake.Head.Location = new Point(0, oldPoint.Y);
+                return;
+            }
+
+            if (snake.Direction == Keys.Right && GameField.IsOutOfRightSide(snake.Head))
+            {
+                snake.Head.Location = new Point(GameField.FIELD_WIDTH - FIELD_WEIGHT, oldPoint.Y);
+                return;
+            }
+
+            switch (snake.Direction)
+            {
+                case Keys.Up:
+                    oldPoint.Y -= Snake.SPEED;
+                    break;
+                case Keys.Down:
+                    oldPoint.Y += Snake.SPEED;
+                    break;
+                case Keys.Left:
+                    oldPoint.X -= Snake.SPEED;
+                    break;
+                case Keys.Right:
+                    oldPoint.X += Snake.SPEED;
+                    break;
+            }
+
+            snake.Head.Location = new Point(oldPoint.X, oldPoint.Y);
         }
 
-        private PictureBox field { get; set; }
         private Snake snake { get; set; }
         private bool isStarted { get; set; }
-        private bool onPause { get; set; }
     }
 }

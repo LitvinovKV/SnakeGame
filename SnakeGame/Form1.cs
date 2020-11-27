@@ -18,7 +18,8 @@ namespace SnakeGame
         public Form1()
         {
             InitializeComponent();
-            game = new Game(pictureBox1);
+            game = new Game(12, 12);
+            Controls.Add(game.GameField.Field);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
