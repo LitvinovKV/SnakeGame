@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace SnakeGame
 {
@@ -19,7 +10,7 @@ namespace SnakeGame
         {
             InitializeComponent();
             game = new Game(12, 12);
-            Controls.Add(game.GameField.Field);
+            Controls.Add(game.GameField);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

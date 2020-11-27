@@ -2,11 +2,11 @@
 
 namespace SnakeGame.SnakeData
 {
-    public class SnakeBodyPart : ElementBase
+    public class SnakeHead : ElementBase
     {
-        public SnakeBodyPart(int x, int y) : base(x, y)
+        public SnakeHead(int x, int y) : base(x, y)
         {
-            BackColor = Color.Red;
+            BackColor = Color.Blue;
         }
 
         protected override string ImagePath { get; set; }

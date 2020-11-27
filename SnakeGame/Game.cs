@@ -8,9 +8,6 @@ namespace SnakeGame
 {
     public class Game
     {
-        public static readonly int FIELD_WEIGHT = 20;
-        public static readonly int FIELD_HEIGHT = 20;
-
         public Timer Timer { get; private set; }
 
         public GameField GameField { get; }
@@ -18,8 +15,8 @@ namespace SnakeGame
         public Game(int fieldX, int fieldY)
         {
             isStarted = false;
-            this.GameField = new GameField(fieldX, fieldY);
-            snake = new Snake((GameField.Field.Location.X + GameField.Field.Width) / 2, (GameField.Field.Location.Y + GameField.Field.Height) / 2);
+            this.GameField = new GameField(fieldX, fieldY, "D:\\Programs\\SnakeGame\\SnakeGame\\bin\\gress.jpg");
+            snake = new Snake((GameField.Location.X + GameField.Width) / 2, (GameField.Location.Y + GameField.Height) / 2);
 
             GameField.AddElement(snake.Head);
 
@@ -72,7 +69,7 @@ namespace SnakeGame
          
             if (snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
             {
-                snake.Head.Location = new Point(oldPoint.X, GameField.FIELD_HEIGHT - FIELD_HEIGHT);
+                snake.Head.Location = new Point(oldPoint.X, GameField.FIELD_HEIGHT - snake.Head.Height);
                 return;
             }
 
@@ -90,7 +87,7 @@ namespace SnakeGame
 
             if (snake.Direction == Keys.Right && GameField.IsOutOfRightSide(snake.Head))
             {
-                snake.Head.Location = new Point(GameField.FIELD_WIDTH - FIELD_WEIGHT, oldPoint.Y);
+                snake.Head.Location = new Point(GameField.FIELD_WIDTH - snake.Head.Width, oldPoint.Y);
                 return;
             }
 

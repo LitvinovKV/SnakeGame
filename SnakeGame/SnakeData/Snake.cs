@@ -8,19 +8,19 @@ namespace SnakeGame.SnakeData
         public static readonly int SPEED = 10;
 
         public Keys Direction { get; set; }
-        public SnakeHeadPart Head { get; private set; }
+        public SnakeHead Head { get; private set; }
 
         public Snake()
         {
-            Body = new Stack<SnakePart>();
+            Body = new Stack<ElementBase>();
         }
 
         public Snake(int headX, int headY) : this()
         {
-            Head = new SnakeHeadPart(headX, headY);
+            Head = new SnakeHead(headX, headY);
             Body.Push(Head);
         }
 
-        private Stack<SnakePart> Body { get; set; }
+        private Stack<ElementBase> Body { get; set; }
     }
 }
