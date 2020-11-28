@@ -55,12 +55,26 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Fruits\Apple.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Fruits\Banana.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Fruits\FruitBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Fruits\Strawberry.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Game.cs" />
     <Compile Include="GameField.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RadnomService\IRandomService.cs" />
+    <Compile Include="RadnomService\RandomService.cs" />
     <Compile Include="SnakeData\Snake.cs" />
     <Compile Include="SnakeData\SnakeHead.cs">
       <SubType>Component</SubType>

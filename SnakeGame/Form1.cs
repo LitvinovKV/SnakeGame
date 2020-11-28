@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using SnakeGame.RadnomService;
+using System.Windows.Forms;
 
 namespace SnakeGame
 {
@@ -9,7 +10,10 @@ namespace SnakeGame
         public Form1()
         {
             InitializeComponent();
-            game = new Game(12, 12);
+
+            var randomService = new RandomService();
+
+            game = new Game(12, 12, randomService);
             Controls.Add(game.GameField);
         }
 

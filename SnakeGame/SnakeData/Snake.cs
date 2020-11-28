@@ -21,6 +21,6 @@ namespace SnakeGame.SnakeData
             Body.Push(Head);
         }
 
-        private Stack<ElementBase> Body { get; set; }
+        public Stack<ElementBase> Body { get; }
     }
 }

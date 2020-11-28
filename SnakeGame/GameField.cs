@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace SnakeGame
@@ -10,6 +11,9 @@ namespace SnakeGame
 
         public void AddElement(Control element)
             => Controls.Add(element);
+
+        public void DeleteElement(Control element)
+            => Controls.Remove(element);
 
         public bool IsOutOfLeftSide(Control element)
             => Contains(element) && element.Location.X <= 0;
@@ -23,12 +27,17 @@ namespace SnakeGame
         public bool IsOutOfDownSide(Control element)
             => Contains(element) && element.Location.Y + element.Height >= FIELD_HEIGHT;
 
-        public GameField(int x, int y, string backgroundImagePath)
+        public GameField(int x, int y, String backgroundImagePath)
         {
             Width = FIELD_WIDTH;
             Height = FIELD_HEIGHT;
             Location = new Point(x, y);
-            Image = Image.FromFile(backgroundImagePath);
+
+            // While don't have images
+            if (backgroundImagePath != null)
+            {
+                Image = Image.FromFile(backgroundImagePath);
+            }
         }
     }
 }
