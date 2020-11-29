@@ -1,9 +1,7 @@
 ﻿using SnakeGame.Fruits;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace SnakeGame.RadnomService
 {
@@ -11,9 +9,10 @@ namespace SnakeGame.RadnomService
     {
         private Random rand { get; } = new Random();
 
-        private Type[] fruitTypes { get; } = AppDomain.CurrentDomain.GetAssemblies()
+        private FruitBase[] fruits { get; } = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => !type.IsAbstract && type.BaseType == typeof(FruitBase))
+            .Select(type => (FruitBase)Activator.CreateInstance(type, new object[] { 0, 0 }))
             .ToArray();
 
         public Point GeneratePoint(int leftX, int leftY, int rightX, int rightY)
@@ -22,24 +21,9 @@ namespace SnakeGame.RadnomService
         public FruitBase GenerateFruit(int leftX, int leftY, int rightX, int rightY)
         {
             var randPoint = GeneratePoint(leftX, leftY, rightX, rightY);
-            return (FruitBase) Activator.CreateInstance(fruitTypes[rand.Next(0, fruitTypes.Length)], new object[] { randPoint.X, randPoint.Y });
-        }
-
-        // TODO каждый раз не генерировать новый фрукт, а просто менять координаты сущетсвующего
-        public FruitBase GenerateFruitNotIn(int leftX, int leftY, int rightX, int rightY, IEnumerable<ElementBase> elements)
-        {
-            while (true)
-            {
-                var randFruit = GenerateFruit(leftX, leftY, rightX, rightY);
-                
-                foreach(var element in elements)
-                {
-                    if (!randFruit.Contains(element))
-                    {
-                        return randFruit;
-                    }
-                }
-            }
+            var fruit = fruits[rand.Next(0, fruits.Length)];
+            fruit.Location = randPoint;
+            return fruit;
         }
     }
 }

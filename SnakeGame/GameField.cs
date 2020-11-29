@@ -6,13 +6,13 @@ namespace SnakeGame
 {
     public class GameField : PictureBox
     {
-        public static readonly int FIELD_WIDTH = 529;
-        public static readonly int FIELD_HEIGHT = 537;
+        public static readonly int FIELD_WIDTH = 540;
+        public static readonly int FIELD_HEIGHT = 540;
 
         public void AddElement(Control element)
             => Controls.Add(element);
 
-        public void DeleteElement(Control element)
+        public void RemoveElement(Control element)
             => Controls.Remove(element);
 
         public bool IsOutOfLeftSide(Control element)

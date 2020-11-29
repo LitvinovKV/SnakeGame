@@ -6,7 +6,7 @@ namespace SnakeGame.Fruits
     {
         public Apple(int x, int y) : base(x, y)
         {
-            BackColor = Color.Red;
+            BackColor = Color.Orange;
         }
 
         protected override string ImagePath { get; set; }

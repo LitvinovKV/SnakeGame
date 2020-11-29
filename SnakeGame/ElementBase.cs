@@ -19,11 +19,13 @@ namespace SnakeGame
             BorderStyle = BorderStyle.FixedSingle;
         }
 
-        public bool Contains(Control otherElement)
-            => Contains(otherElement.Location)
-                || Contains(new Point(otherElement.Location.X + otherElement.Width, otherElement.Location.Y + otherElement.Height));
+        public bool Include(Control otherElement)
+            => Include(otherElement.Location)
+                || Include(new Point(otherElement.Location.X + otherElement.Width, otherElement.Location.Y + otherElement.Height))
+                || Include(new Point(otherElement.Location.X + otherElement.Width, otherElement.Location.Y))
+                || Include(new Point(otherElement.Location.X, otherElement.Location.Y + otherElement.Height));
 
-        public bool Contains(Point otherPoint)
+        public bool Include(Point otherPoint)
             => otherPoint.X >= Location.X && otherPoint.X <= Location.X + Width
                 && otherPoint.Y >= Location.Y && otherPoint.Y <= Location.Y + Height;
     }

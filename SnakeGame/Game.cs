@@ -20,10 +20,12 @@ namespace SnakeGame
 
             isStarted = false;
             this.GameField = new GameField(fieldX, fieldY, "D:\\Programs\\SnakeGame\\SnakeGame\\bin\\gress.jpg");
-            snake = new Snake((GameField.Location.X + GameField.Width) / 2, (GameField.Location.Y + GameField.Height) / 2);
-            fruit = GenerateGameFruit();
-
+            
+            snake = new Snake(0, 0);
             GameField.AddElement(snake.Head);
+            snake.Head.Location = new Point(GameField.FIELD_WIDTH / 2, GameField.FIELD_HEIGHT / 2);
+
+            fruit = GenerateGameFruit();
             GameField.AddElement(fruit);
 
             InitTimer();
@@ -32,7 +34,7 @@ namespace SnakeGame
         private void InitTimer()
         {
             Timer = new Timer();
-            Timer.Interval = 100;
+            Timer.Interval = 10;
             Timer.Tick += MoveSnake;
         }
 
@@ -71,8 +73,6 @@ namespace SnakeGame
 
         private void MoveSnake(object sender, EventArgs e)
         {
-            Timer.Enabled = false;
-
             var oldPoint = snake.Head.Location;
 
             if (snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
@@ -123,16 +123,27 @@ namespace SnakeGame
                 // TODO Увеличть скорость
                 // TODO Увеличить змейку
                 // TODO Удалить фрукт
+                GameField.RemoveElement(fruit);
+                fruit = GenerateGameFruit();
+                GameField.AddElement(fruit);
             }
-
-            Timer.Enabled = true;
         }
 
         private bool CanSnakeEatFruit()
-            => snake.Head.Contains(fruit);
+            => snake.Head.Include(fruit);
 
         private FruitBase GenerateGameFruit()
-            => randomService.GenerateFruitNotIn(0, 0, GameField.FIELD_WIDTH - ElementBase.WIDTH, GameField.FIELD_HEIGHT - ElementBase.HEIGHT, snake.Body);
+        {
+            while(true)
+            {
+                var randFruit = randomService.GenerateFruit(0, 0, GameField.FIELD_WIDTH - ElementBase.WIDTH, GameField.FIELD_HEIGHT - ElementBase.HEIGHT);
+                
+                if (!snake.Head.Include(randFruit))
+                {
+                    return randFruit;
+                }
+            }
+        }
 
         private Snake snake { get; set; }
         private bool isStarted { get; set; }
