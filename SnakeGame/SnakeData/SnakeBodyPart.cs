@@ -6,7 +6,7 @@ namespace SnakeGame.SnakeData
     {
         public SnakeBodyPart(int x, int y) : base(x, y)
         {
-            BackColor = Color.Red;
+            BackColor = Color.White;
         }
 
         protected override string ImagePath { get; set; }

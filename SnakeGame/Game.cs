@@ -19,7 +19,9 @@ namespace SnakeGame
             this.randomService = randomService;
 
             isStarted = false;
+            onPause = false;
             this.GameField = new GameField(fieldX, fieldY, "D:\\Programs\\SnakeGame\\SnakeGame\\bin\\gress.jpg");
+            score = 0;
             
             snake = new Snake(0, 0);
             GameField.AddElement(snake.Head);
@@ -34,7 +36,7 @@ namespace SnakeGame
         private void InitTimer()
         {
             Timer = new Timer();
-            Timer.Interval = 10;
+            Timer.Interval = 100;
             Timer.Tick += MoveSnake;
         }
 
@@ -47,7 +49,7 @@ namespace SnakeGame
                 StartGame();
             }
 
-            if (!Timer.Enabled)
+            if (onPause)
             {
                 return;
             }
@@ -58,8 +60,8 @@ namespace SnakeGame
         public void SpaceButtonClick()
         {
             Debug.WriteLine("SPACE KEY CLICKED!");
-
-            Timer.Enabled = !Timer.Enabled & isStarted;
+            onPause = !onPause;
+            Timer.Enabled = !onPause & isStarted;
 
             Debug.WriteLine("GAME " + (Timer.Enabled ? "PAUSED" : "RESUMED"));
         }
@@ -74,28 +76,31 @@ namespace SnakeGame
         private void MoveSnake(object sender, EventArgs e)
         {
             var oldPoint = snake.Head.Location;
-
             if (snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
             {
-                snake.Head.Location = new Point(oldPoint.X, GameField.FIELD_HEIGHT - snake.Head.Height);
+                Timer.Enabled = false;
+                MessageBox.Show("YOU LOOOSE! OUT OF DOWN!");
                 return;
             }
 
             if (snake.Direction == Keys.Up && GameField.IsOutOfUpSide(snake.Head))
             {
-                snake.Head.Location = new Point(oldPoint.X, 0);
+                Timer.Enabled = false;
+                MessageBox.Show("YOU LOOOSE! OUT OF UP!");
                 return;
             }
 
             if (snake.Direction == Keys.Left && GameField.IsOutOfLeftSide(snake.Head))
             {
-                snake.Head.Location = new Point(0, oldPoint.Y);
+                Timer.Enabled = false;
+                MessageBox.Show("YOU LOOOSE! OUT OF LEFT!");
                 return;
             }
 
             if (snake.Direction == Keys.Right && GameField.IsOutOfRightSide(snake.Head))
             {
-                snake.Head.Location = new Point(GameField.FIELD_WIDTH - snake.Head.Width, oldPoint.Y);
+                Timer.Enabled = false;
+                MessageBox.Show("YOU LOOOSE! OUT OF RIGHT!");
                 return;
             }
 
@@ -115,13 +120,19 @@ namespace SnakeGame
                     break;
             }
 
-            snake.Head.Location = new Point(oldPoint.X, oldPoint.Y);
+            snake.Move(oldPoint.X, oldPoint.Y);
 
             if (CanSnakeEatFruit())
             {
                 // TODO Увеличить кол-во очков
+                score++;
+
                 // TODO Увеличть скорость
+
                 // TODO Увеличить змейку
+                var newSnakePart = snake.IncreaseBody();
+                GameField.AddElement(newSnakePart);
+
                 // TODO Удалить фрукт
                 GameField.RemoveElement(fruit);
                 fruit = GenerateGameFruit();
@@ -136,7 +147,7 @@ namespace SnakeGame
         {
             while(true)
             {
-                var randFruit = randomService.GenerateFruit(0, 0, GameField.FIELD_WIDTH - ElementBase.WIDTH, GameField.FIELD_HEIGHT - ElementBase.HEIGHT);
+                var randFruit = randomService.GenerateFruit(0, 0, GameField.FIELD_WIDTH - ElementBase.SIZE, GameField.FIELD_HEIGHT - ElementBase.SIZE);
                 
                 if (!snake.Head.Include(randFruit))
                 {
@@ -147,7 +158,9 @@ namespace SnakeGame
 
         private Snake snake { get; set; }
         private bool isStarted { get; set; }
+        private bool onPause { get; set; }
         private FruitBase fruit { get; set; }
+        private int score { get; set; }
 
         private readonly IRandomService randomService;
     }
