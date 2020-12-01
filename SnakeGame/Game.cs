@@ -25,7 +25,9 @@ namespace SnakeGame
             
             snake = new Snake(0, 0);
             GameField.AddElement(snake.Head);
-            snake.Head.Location = new Point(GameField.FIELD_WIDTH / 2, GameField.FIELD_HEIGHT / 2);
+
+            var middleLeftTopPoint = ((GameField.SIZE / ElementBase.SIZE) / 2) * ElementBase.SIZE;
+            snake.Head.Location = new Point(middleLeftTopPoint, middleLeftTopPoint);
 
             fruit = GenerateGameFruit();
             GameField.AddElement(fruit);
@@ -76,31 +78,13 @@ namespace SnakeGame
         private void MoveSnake(object sender, EventArgs e)
         {
             var oldPoint = snake.Head.Location;
-            if (snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
+            if ((snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
+                || (snake.Direction == Keys.Up && GameField.IsOutOfUpSide(snake.Head))
+                || (snake.Direction == Keys.Left && GameField.IsOutOfLeftSide(snake.Head))
+                || (snake.Direction == Keys.Right && GameField.IsOutOfRightSide(snake.Head)))
             {
                 Timer.Enabled = false;
                 MessageBox.Show("YOU LOOOSE! OUT OF DOWN!");
-                return;
-            }
-
-            if (snake.Direction == Keys.Up && GameField.IsOutOfUpSide(snake.Head))
-            {
-                Timer.Enabled = false;
-                MessageBox.Show("YOU LOOOSE! OUT OF UP!");
-                return;
-            }
-
-            if (snake.Direction == Keys.Left && GameField.IsOutOfLeftSide(snake.Head))
-            {
-                Timer.Enabled = false;
-                MessageBox.Show("YOU LOOOSE! OUT OF LEFT!");
-                return;
-            }
-
-            if (snake.Direction == Keys.Right && GameField.IsOutOfRightSide(snake.Head))
-            {
-                Timer.Enabled = false;
-                MessageBox.Show("YOU LOOOSE! OUT OF RIGHT!");
                 return;
             }
 
@@ -147,7 +131,7 @@ namespace SnakeGame
         {
             while(true)
             {
-                var randFruit = randomService.GenerateFruit(0, 0, GameField.FIELD_WIDTH - ElementBase.SIZE, GameField.FIELD_HEIGHT - ElementBase.SIZE);
+                var randFruit = randomService.GenerateFruit(0, 0, GameField.SIZE - ElementBase.SIZE, GameField.SIZE - ElementBase.SIZE);
                 
                 if (!snake.Head.Include(randFruit))
                 {

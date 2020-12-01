@@ -6,8 +6,7 @@ namespace SnakeGame
 {
     public class GameField : PictureBox
     {
-        public static readonly int FIELD_WIDTH = 540;
-        public static readonly int FIELD_HEIGHT = 540;
+        public static readonly int SIZE = 27 * ElementBase.SIZE;
 
         public void AddElement(Control element)
             => Controls.Add(element);
@@ -22,15 +21,15 @@ namespace SnakeGame
             => Contains(element) && element.Location.Y <= 0;
 
         public bool IsOutOfRightSide(Control element)
-            => Contains(element) && element.Location.X + element.Width >= FIELD_WIDTH;
+            => Contains(element) && element.Location.X + element.Width >= SIZE;
 
         public bool IsOutOfDownSide(Control element)
-            => Contains(element) && element.Location.Y + element.Height >= FIELD_HEIGHT;
+            => Contains(element) && element.Location.Y + element.Height >= SIZE;
 
         public GameField(int x, int y, String backgroundImagePath)
         {
-            Width = FIELD_WIDTH;
-            Height = FIELD_HEIGHT;
+            Width = SIZE;
+            Height = SIZE;
             Location = new Point(x, y);
 
             // While don't have images
