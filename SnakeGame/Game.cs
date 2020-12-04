@@ -1,9 +1,8 @@
-﻿using SnakeGame.Fruits;
-using SnakeGame.RadnomService;
-using SnakeGame.SnakeData;
+﻿using SnakeGame.RadnomService;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SnakeGame
@@ -20,17 +19,29 @@ namespace SnakeGame
 
             isStarted = false;
             onPause = false;
-            this.GameField = new GameField(fieldX, fieldY, "D:\\Programs\\SnakeGame\\SnakeGame\\bin\\gress.jpg");
-            score = 0;
+            currentSnakeDirection = Keys.None;
             
-            snake = new Snake(0, 0);
-            GameField.AddElement(snake.Head);
+            GameField = new GameField(fieldX, fieldY);
+            var middlePos = GameField.TableSize / 2;
+            GameField.UpdateTableField(middlePos, middlePos, ElementType.SnakeHead);
+            
+            snakeHead = GameField.GetTableElement(middlePos, middlePos);
 
-            var middleLeftTopPoint = ((GameField.SIZE / ElementBase.SIZE) / 2) * ElementBase.SIZE;
-            snake.Head.Location = new Point(middleLeftTopPoint, middleLeftTopPoint);
+            snakeBody = new ElementBase[GameField.TableSize * GameField.TableSize];
+            snakeBody[0] = snakeHead;
+            currentSnakeLenght++;
 
-            fruit = GenerateGameFruit();
-            GameField.AddElement(fruit);
+            GameField.UpdateTableField(middlePos + currentSnakeLenght, middlePos, ElementType.SnakeBodyPart);
+            snakeBody[currentSnakeLenght] = GameField.GetTableElement(middlePos + currentSnakeLenght, middlePos);
+            currentSnakeLenght++;
+
+            GameField.UpdateTableField(middlePos + currentSnakeLenght, middlePos, ElementType.SnakeBodyPart);
+            snakeBody[currentSnakeLenght] = GameField.GetTableElement(middlePos + currentSnakeLenght, middlePos);
+            currentSnakeLenght++;
+
+            GameField.UpdateTableField(middlePos + currentSnakeLenght, middlePos, ElementType.SnakeBodyPart);
+            snakeBody[currentSnakeLenght] = GameField.GetTableElement(middlePos + currentSnakeLenght, middlePos);
+            currentSnakeLenght++;
 
             InitTimer();
         }
@@ -44,6 +55,7 @@ namespace SnakeGame
 
         public void ArrowButtonClick(Keys key)
         {
+            clickedArrow = key;
             Debug.WriteLine("ARROW CLICKED: " + key.ToString());
 
             if (!isStarted)
@@ -55,8 +67,6 @@ namespace SnakeGame
             {
                 return;
             }
-
-            snake.Direction = key;
         }
 
         public void SpaceButtonClick()
@@ -77,74 +87,75 @@ namespace SnakeGame
 
         private void MoveSnake(object sender, EventArgs e)
         {
-            var oldPoint = snake.Head.Location;
-            if ((snake.Direction == Keys.Down && GameField.IsOutOfDownSide(snake.Head))
-                || (snake.Direction == Keys.Up && GameField.IsOutOfUpSide(snake.Head))
-                || (snake.Direction == Keys.Left && GameField.IsOutOfLeftSide(snake.Head))
-                || (snake.Direction == Keys.Right && GameField.IsOutOfRightSide(snake.Head)))
+            Timer.Enabled = false;
+
+            // Если нельзя идти в противоположную сторону
+            currentSnakeDirection =
+                currentSnakeDirection == Keys.Up && clickedArrow == Keys.Down
+                || currentSnakeDirection == Keys.Down && clickedArrow == Keys.Up
+                || currentSnakeDirection == Keys.Left && clickedArrow == Keys.Right
+                || currentSnakeDirection == Keys.Right && clickedArrow == Keys.Left
+                ? currentSnakeDirection
+                : clickedArrow;
+            
+            //currentSnakeDirection = clickedArrow; Если можно идти в противоположную сторону
+
+            var snakeHeadNewI = snakeHead.I;
+            var snakeHeadNewJ = snakeHead.J;
+            switch (currentSnakeDirection)
             {
-                Timer.Enabled = false;
-                MessageBox.Show("YOU LOOOSE! OUT OF DOWN!");
+                case Keys.Up:
+                    snakeHeadNewI--;
+                    break;
+                case Keys.Down:
+                    snakeHeadNewI++;
+                    break;
+                case Keys.Left:
+                    snakeHeadNewJ--;
+                    break;
+                case Keys.Right:
+                    snakeHeadNewJ++;
+                    break;
+            }
+
+            if (currentSnakeDirection == Keys.Up && snakeHeadNewI < 0
+                || currentSnakeDirection == Keys.Down && snakeHeadNewI >= GameField.TableSize
+                || currentSnakeDirection == Keys.Left && snakeHeadNewJ < 0
+                || currentSnakeDirection == Keys.Right && snakeHeadNewJ >= GameField.TableSize)
+            {
+                MessageBox.Show($"YOU LOSE! OUT OF { clickedArrow }");
                 return;
             }
 
-            switch (snake.Direction)
+            // TODO Попытаться придумать что-то с обновлением цвета ячейки по типу автоматически
+            if (currentSnakeLenght > 1)
             {
-                case Keys.Up:
-                    oldPoint.Y -= Snake.SPEED;
-                    break;
-                case Keys.Down:
-                    oldPoint.Y += Snake.SPEED;
-                    break;
-                case Keys.Left:
-                    oldPoint.X -= Snake.SPEED;
-                    break;
-                case Keys.Right:
-                    oldPoint.X += Snake.SPEED;
-                    break;
-            }
+                snakeBody[currentSnakeLenght - 1].Type = ElementType.BaseField;
+                snakeBody[currentSnakeLenght - 1].UpdateColor();
 
-            snake.Move(oldPoint.X, oldPoint.Y);
-
-            if (CanSnakeEatFruit())
-            {
-                // TODO Увеличить кол-во очков
-                score++;
-
-                // TODO Увеличть скорость
-
-                // TODO Увеличить змейку
-                var newSnakePart = snake.IncreaseBody();
-                GameField.AddElement(newSnakePart);
-
-                // TODO Удалить фрукт
-                GameField.RemoveElement(fruit);
-                fruit = GenerateGameFruit();
-                GameField.AddElement(fruit);
-            }
-        }
-
-        private bool CanSnakeEatFruit()
-            => snake.Head.Include(fruit);
-
-        private FruitBase GenerateGameFruit()
-        {
-            while(true)
-            {
-                var randFruit = randomService.GenerateFruit(0, 0, GameField.SIZE - ElementBase.SIZE, GameField.SIZE - ElementBase.SIZE);
-                
-                if (!snake.Head.Include(randFruit))
+                for (var i = currentSnakeLenght - 1; i >= 1; i--)
                 {
-                    return randFruit;
+                    snakeBody[i] = snakeBody[i - 1];
+                    snakeBody[i].Type = ElementType.SnakeBodyPart;
+                    snakeBody[i].UpdateColor();
                 }
             }
+
+            snakeHead = GameField.UpdateTableField(snakeHead, snakeHeadNewI, snakeHeadNewJ);
+            snakeHead.Type = ElementType.SnakeHead;
+            snakeHead.UpdateColor();
+            snakeBody[0] = snakeHead;
+
+            Timer.Enabled = true;
         }
 
-        private Snake snake { get; set; }
         private bool isStarted { get; set; }
         private bool onPause { get; set; }
-        private FruitBase fruit { get; set; }
-        private int score { get; set; }
+        private Keys clickedArrow { get; set; }
+        private Keys currentSnakeDirection { get; set; }
+        private ElementBase snakeHead { get; set; }
+        private ElementBase[] snakeBody { get; set; }
+        private int currentSnakeLenght { get; set; }
 
         private readonly IRandomService randomService;
     }

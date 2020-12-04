@@ -6,37 +6,64 @@ namespace SnakeGame
 {
     public class GameField : PictureBox
     {
-        public static readonly int SIZE = 27 * ElementBase.SIZE;
-
-        public void AddElement(Control element)
-            => Controls.Add(element);
-
-        public void RemoveElement(Control element)
-            => Controls.Remove(element);
-
-        public bool IsOutOfLeftSide(Control element)
-            => Contains(element) && element.Location.X <= 0;
-
-        public bool IsOutOfUpSide(Control element)
-            => Contains(element) && element.Location.Y <= 0;
-
-        public bool IsOutOfRightSide(Control element)
-            => Contains(element) && element.Location.X + element.Width >= SIZE;
-
-        public bool IsOutOfDownSide(Control element)
-            => Contains(element) && element.Location.Y + element.Height >= SIZE;
-
-        public GameField(int x, int y, String backgroundImagePath)
+        public static int TableSize { get; } = 27;
+        
+        public GameField(int x, int y)
         {
-            Width = SIZE;
-            Height = SIZE;
-            Location = new Point(x, y);
+            Table = new ElementBase[TableSize, TableSize];
 
-            // While don't have images
-            if (backgroundImagePath != null)
+            for (var i = 0; i < TableSize; i++)
             {
-                Image = Image.FromFile(backgroundImagePath);
+                for (var j = 0; j < TableSize; j++)
+                {
+                    Table[i, j] = new ElementBase(i, j);
+                    Controls.Add(Table[i, j]);
+                }
             }
+
+            Width = TableSize * ElementBase.SIZE;
+            Height = TableSize * ElementBase.SIZE;
+            Location = new Point(x, y);
         }
+
+        public void UpdateTableField(int i, int j, ElementType type)
+        {
+            if (i < 0 || i >= TableSize)
+            {
+                throw new ArgumentException($"i must be >= 0 and < { TableSize }");
+            }
+
+            if (j < 0 || j >= TableSize)
+            {
+                throw new ArgumentException($"j must be >= 0 and < { TableSize }");
+            }
+
+            Table[i, j].Type = type;
+            Table[i, j].UpdateColor();
+        }
+
+        public ElementBase UpdateTableField(ElementBase tableField, int newI, int newJ)
+        {
+            UpdateTableField(newI, newJ, tableField.Type);
+            //UpdateTableField(tableField.I, tableField.J, ElementType.BaseField);
+            return Table[newI, newJ];
+        }
+
+        public ElementBase GetTableElement(int i, int j)
+        {
+            if (i < 0 || i >= TableSize)
+            {
+                throw new ArgumentException($"i must be >= 0 and < { TableSize }");
+            }
+
+            if (j < 0 || j >= TableSize)
+            {
+                throw new ArgumentException($"j must be >= 0 and < { TableSize }");
+            }
+
+            return Table[i, j];
+        }
+
+        private ElementBase[,] Table { get; set; }
     }
 }
