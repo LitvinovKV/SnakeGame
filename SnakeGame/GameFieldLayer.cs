@@ -5,30 +5,28 @@ using System.Windows.Forms;
 
 namespace SnakeGame
 {
-    public class GameField : Control
+    public class GameFieldLayer : PictureBox
     {
-        public static int SIZE { get; } = 27;
-        public static int ELEMENT_SIZE { get; } = 20;
+        public static int COUNT_CELLS { get; } = 27;
+        public static int CELL_SIZE { get; } = 20;
 
         public Stack<RectangleWrapp> RedrawRectWrappStack { get; }
 
-        public GameField(int x, int y)
+        public GameFieldLayer(int x, int y)
         {
-            Enabled = false;
-            NewTable = new RectangleWrapp[SIZE, SIZE];
-            RedrawRectWrappStack = new Stack<RectangleWrapp>();
+            NewTable = new RectangleWrapp[COUNT_CELLS, COUNT_CELLS];
 
-            for (var i = 0; i < SIZE; i++)
+            for (var i = 0; i < COUNT_CELLS; i++)
             {
-                for (var j = 0; j < SIZE; j++)
+                for (var j = 0; j < COUNT_CELLS; j++)
                 {
                     NewTable[i, j] = new RectangleWrapp(i, j);
                 }
             }
 
             //without this + 1 left and bottom border hide
-            Width = SIZE * ELEMENT_SIZE + 1;
-            Height = SIZE* ELEMENT_SIZE + 1;
+            Width = COUNT_CELLS * CELL_SIZE + 1;
+            Height = COUNT_CELLS* CELL_SIZE + 1;
 
             Location = new Point(x, y);
         }
@@ -55,14 +53,25 @@ namespace SnakeGame
 
         private void CheckTableIndexes(int i, int j)
         {
-            if (i < 0 || i >= SIZE)
+            if (i < 0 || i >= COUNT_CELLS)
             {
-                throw new ArgumentException($"i must be >= 0 and < { SIZE }");
+                throw new ArgumentException($"i must be >= 0 and < { COUNT_CELLS }");
             }
 
-            if (j < 0 || j >= SIZE)
+            if (j < 0 || j >= COUNT_CELLS)
             {
-                throw new ArgumentException($"j must be >= 0 and < { SIZE }");
+                throw new ArgumentException($"j must be >= 0 and < { COUNT_CELLS }");
+            }
+        }
+
+        private void RedrawStackElements(object sender, PaintEventArgs pe)
+        {
+            var graphics = pe.Graphics;
+
+            while (RedrawRectWrappStack.Count != 0)
+            {
+                var element = RedrawRectWrappStack.Pop();
+                graphics.FillRectangle(element.CurrentBrush, element.Rect);
             }
         }
 
@@ -73,9 +82,9 @@ namespace SnakeGame
             var graphics = pe.Graphics;
             var pen = new Pen(Color.Black);
 
-            for (var i = 0; i < SIZE; i++)
+            for (var i = 0; i < COUNT_CELLS; i++)
             {
-                for (var j = 0; j < SIZE; j++)
+                for (var j = 0; j < COUNT_CELLS; j++)
                 {
                     graphics.FillRectangle(NewTable[i, j].CurrentBrush, NewTable[i, j].Rect);
                     graphics.DrawRectangle(pen, NewTable[i, j].Rect);

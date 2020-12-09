@@ -14,7 +14,8 @@ namespace SnakeGame
 
         public Timer Timer { get; private set; }
 
-        public GameField GameField { get; }
+        public GameFieldLayer GameFieldLayer { get; }
+        public SnakeLayer SnakeLayer { get; }
 
         public Game(int fieldX, int fieldY)
         {
@@ -22,8 +23,11 @@ namespace SnakeGame
             onPause = false;
             currentSnakeDirection = Keys.None;
 
-            GameField = new GameField(fieldX, fieldY);
+            GameFieldLayer = new GameFieldLayer(fieldX, fieldY);
+            SnakeLayer = new SnakeLayer(GameFieldLayer);
 
+            var GameFieldLayerMiddle = GameFieldLayer.COUNT_CELLS / 2;
+            SnakeLayer.MoveSnakeHeadTo(GameFieldLayerMiddle, GameFieldLayerMiddle);
             //GameField.UpdateTableField(middlePos, middlePos, ElementType.SnakeHead);
 
             //snakeHead = GameField.GetTableElement(middlePos, middlePos);
@@ -57,10 +61,10 @@ namespace SnakeGame
         public void ArrowButtonClick(Keys key)
         {
 
-            var middlePos = GameField.SIZE / 2;
-            snakeHead = GameField.UpdateFieldElement(middlePos, middlePos, SNAKE_HEAD_BRUSH);
-            UpdateHeadIndexes(middlePos, middlePos);
-            GameField.Invalidate();
+            //var middlePos = GameField.SIZE / 2;
+            //snakeHead = GameField.UpdateFieldElement(middlePos, middlePos, SNAKE_HEAD_BRUSH);
+            //UpdateHeadIndexes(middlePos, middlePos);
+            //GameField.Invalidate();
 
             clickedArrow = key;
             Debug.WriteLine("ARROW CLICKED: " + key.ToString());
@@ -96,34 +100,31 @@ namespace SnakeGame
         {
             Timer.Enabled = false;
 
-            //    // Если нельзя идти в противоположную сторону
-            //    currentSnakeDirection =
-            //        currentSnakeDirection == Keys.Up && clickedArrow == Keys.Down
-            //        || currentSnakeDirection == Keys.Down && clickedArrow == Keys.Up
-            //        || currentSnakeDirection == Keys.Left && clickedArrow == Keys.Right
-            //        || currentSnakeDirection == Keys.Right && clickedArrow == Keys.Left
-            //        ? currentSnakeDirection
-            //        : clickedArrow;
+            // Если нельзя идти в противоположную сторону
+            currentSnakeDirection =
+                currentSnakeDirection == Keys.Up && clickedArrow == Keys.Down
+                || currentSnakeDirection == Keys.Down && clickedArrow == Keys.Up
+                || currentSnakeDirection == Keys.Left && clickedArrow == Keys.Right
+                || currentSnakeDirection == Keys.Right && clickedArrow == Keys.Left
+                ? currentSnakeDirection
+                : clickedArrow;
 
-            //    //currentSnakeDirection = clickedArrow; Если можно идти в противоположную сторону
-
-            //    var snakeHeadNewI = headI;
-            //    var snakeHeadNewJ = headJ;
-            //    switch (currentSnakeDirection)
-            //    {
-            //        case Keys.Up:
-            //            headI--;
-            //            break;
-            //        case Keys.Down:
-            //            headI++;
-            //            break;
-            //        case Keys.Left:
-            //            headJ--;
-            //            break;
-            //        case Keys.Right:
-            //            headJ++;
-            //            break;
-            //    }
+            //currentSnakeDirection = clickedArrow; Если можно идти в противоположную сторону
+            switch (currentSnakeDirection)
+            {
+                case Keys.Up:
+                    SnakeLayer.MoveSnakeHeadTo(--SnakeLayer.snakeHeadI, SnakeLayer.snakeHeadJ);
+                    break;
+                case Keys.Down:
+                    SnakeLayer.MoveSnakeHeadTo(++SnakeLayer.snakeHeadI, SnakeLayer.snakeHeadJ);
+                    break;
+                case Keys.Left:
+                    SnakeLayer.MoveSnakeHeadTo(SnakeLayer.snakeHeadI, --SnakeLayer.snakeHeadJ);
+                    break;
+                case Keys.Right:
+                    SnakeLayer.MoveSnakeHeadTo(SnakeLayer.snakeHeadI, ++SnakeLayer.snakeHeadJ);
+                    break;
+            }
 
             //if (currentSnakeDirection == Keys.Up && snakeHeadNewI < 0
             //    || currentSnakeDirection == Keys.Down && snakeHeadNewI >= GameField.TableSize
@@ -160,20 +161,11 @@ namespace SnakeGame
         //    Timer.Enabled = true;
         //}
 
-        private void UpdateHeadIndexes(int i, int j)
-        {
-            headI = i;
-            headJ = j;
-        }
-
 
         private bool isStarted { get; set; }
         private bool onPause { get; set; }
         private Keys clickedArrow { get; set; }
         private Keys currentSnakeDirection { get; set; }
-        private RectangleWrapp snakeHead { get; set; }
-        private int headI { get; set; }
-        private int headJ { get; set; }
 
         private readonly IRandomService randomService;
     }

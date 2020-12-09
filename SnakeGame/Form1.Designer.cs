@@ -67,7 +67,7 @@ namespace SnakeGame
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(169, 38);
             this.label3.TabIndex = 3;
-            this.label3.Text = "Press any Row to\r\nStart Game";
+            this.label3.Text = "Press any Arrow to\r\nStart Game";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label5
@@ -90,7 +90,8 @@ namespace SnakeGame
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(game.GameField);
+            this.Controls.Add(game.GameFieldLayer);
+            //this.Controls.Add(game.Snake);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
