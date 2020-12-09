@@ -1,69 +1,88 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace SnakeGame
 {
-    public class GameField : PictureBox
+    public class GameField : Control
     {
-        public static int TableSize { get; } = 27;
-        
+        public static int SIZE { get; } = 27;
+        public static int ELEMENT_SIZE { get; } = 20;
+
+        public Stack<RectangleWrapp> RedrawRectWrappStack { get; }
+
         public GameField(int x, int y)
         {
-            Table = new ElementBase[TableSize, TableSize];
+            Enabled = false;
+            NewTable = new RectangleWrapp[SIZE, SIZE];
+            RedrawRectWrappStack = new Stack<RectangleWrapp>();
 
-            for (var i = 0; i < TableSize; i++)
+            for (var i = 0; i < SIZE; i++)
             {
-                for (var j = 0; j < TableSize; j++)
+                for (var j = 0; j < SIZE; j++)
                 {
-                    Table[i, j] = new ElementBase(i, j);
-                    Controls.Add(Table[i, j]);
+                    NewTable[i, j] = new RectangleWrapp(i, j);
                 }
             }
 
-            Width = TableSize * ElementBase.SIZE;
-            Height = TableSize * ElementBase.SIZE;
+            //without this + 1 left and bottom border hide
+            Width = SIZE * ELEMENT_SIZE + 1;
+            Height = SIZE* ELEMENT_SIZE + 1;
+
             Location = new Point(x, y);
         }
 
-        public void UpdateTableField(int i, int j, ElementType type)
+        public RectangleWrapp this[int i, int j]
         {
-            if (i < 0 || i >= TableSize)
+            get
             {
-                throw new ArgumentException($"i must be >= 0 and < { TableSize }");
+                CheckTableIndexes(i, j);
+                return NewTable[i, j];
             }
-
-            if (j < 0 || j >= TableSize)
-            {
-                throw new ArgumentException($"j must be >= 0 and < { TableSize }");
-            }
-
-            Table[i, j].Type = type;
-            Table[i, j].UpdateColor();
         }
 
-        public ElementBase UpdateTableField(ElementBase tableField, int newI, int newJ)
+        public RectangleWrapp UpdateFieldElement(int i, int j, Brush brush)
         {
-            UpdateTableField(newI, newJ, tableField.Type);
-            //UpdateTableField(tableField.I, tableField.J, ElementType.BaseField);
-            return Table[newI, newJ];
+            CheckTableIndexes(i, j);
+            RedrawRectWrappStack.Push(NewTable[i, j]);
+            NewTable[i, j].CurrentBrush = brush;
+            return NewTable[i, j];
         }
 
-        public ElementBase GetTableElement(int i, int j)
+        public void UpdateFieldElementToBase(int i, int j)
+            => UpdateFieldElement(i, j, Game.EMPTY_CELL);
+
+        private void CheckTableIndexes(int i, int j)
         {
-            if (i < 0 || i >= TableSize)
+            if (i < 0 || i >= SIZE)
             {
-                throw new ArgumentException($"i must be >= 0 and < { TableSize }");
+                throw new ArgumentException($"i must be >= 0 and < { SIZE }");
             }
 
-            if (j < 0 || j >= TableSize)
+            if (j < 0 || j >= SIZE)
             {
-                throw new ArgumentException($"j must be >= 0 and < { TableSize }");
+                throw new ArgumentException($"j must be >= 0 and < { SIZE }");
             }
-
-            return Table[i, j];
         }
 
-        private ElementBase[,] Table { get; set; }
+        protected override void OnPaint(PaintEventArgs pe)
+        {
+            base.OnPaint(pe);
+
+            var graphics = pe.Graphics;
+            var pen = new Pen(Color.Black);
+
+            for (var i = 0; i < SIZE; i++)
+            {
+                for (var j = 0; j < SIZE; j++)
+                {
+                    graphics.FillRectangle(NewTable[i, j].CurrentBrush, NewTable[i, j].Rect);
+                    graphics.DrawRectangle(pen, NewTable[i, j].Rect);
+                }
+            }
+        }
+
+        private RectangleWrapp[,] NewTable { get; }
     }
 }

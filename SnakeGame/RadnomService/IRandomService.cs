@@ -5,6 +5,5 @@ namespace SnakeGame.RadnomService
 {
     public interface IRandomService
     {
-         ElementType GenerateFruit(int tableSize, IList<ElementBase> snakeBody);
     }
 }

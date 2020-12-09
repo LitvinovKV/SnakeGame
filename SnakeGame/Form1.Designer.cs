@@ -35,6 +35,7 @@ namespace SnakeGame
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            game = new Game(12, 12);
             this.SuspendLayout();
             // 
             // label1
@@ -89,13 +90,12 @@ namespace SnakeGame
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.Controls.Add(game.GameField);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Snake Game";
             this.ResumeLayout(false);
-            this.PerformLayout();
-
         }
 
         #endregion
@@ -104,6 +104,8 @@ namespace SnakeGame
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label5;
+        private Game game;
+
     }
 }
 

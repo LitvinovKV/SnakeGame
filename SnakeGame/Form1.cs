@@ -1,20 +1,15 @@
 ﻿using SnakeGame.RadnomService;
+using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace SnakeGame
 {
     public partial class Form1 : Form
     {
-        private Game game { get; }
-
         public Form1()
         {
             InitializeComponent();
-
-            var randomService = new RandomService();
-
-            game = new Game(12, 12, randomService);
-            Controls.Add(game.GameField);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
