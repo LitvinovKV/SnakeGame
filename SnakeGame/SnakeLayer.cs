@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,45 +6,38 @@ namespace SnakeGame
 {
     public class SnakeLayer : PictureBox
     {
-        public static Brush SNAKE_HEAD_BRUSH = Brushes.DarkGreen;
-        public static Brush SNAKE_BODY_BRUSH = Brushes.Goldenrod;
+        public Snake Snake { get; private set; }
 
-        public SnakeLayer(PictureBox parentLayer)
+        public SnakeLayer(PictureBoxCells parentLayer, int rowNumber, int columnNumber)
         {
+            Parent = parentLayer;
+
             //without this + 1 left and bottom border hide
             Width = parentLayer.Width;
             Height = parentLayer.Height;
             BackColor = Color.Transparent;
-            Parent = parentLayer;
-            SnakeBody = new List<Rectangle>();
-        }
 
-        public void MoveSnakeHeadTo(int i, int j)
-        {
-            snakeHeadI = i;
-            snakeHeadJ = j;
-            Invalidate();
+            Snake = new Snake(rowNumber, columnNumber, PictureBoxCell.SIZE * PictureBoxCell.SIZE);
+            pen = new Pen(Color.Black);
         }
 
         protected override void OnPaint(PaintEventArgs pe)
         {
             base.OnPaint(pe);
             
-            var pen = new Pen(Color.Black);
-
             var graphics = pe.Graphics;
             var rect = new Rectangle(
-                snakeHeadJ * GameFieldLayer.CELL_SIZE,
-                snakeHeadI * GameFieldLayer.CELL_SIZE,
-                GameFieldLayer.CELL_SIZE,
-                GameFieldLayer.CELL_SIZE);
+                Snake.Head.Item2 * PictureBoxCell.SIZE,
+                Snake.Head.Item1 * PictureBoxCell.SIZE,
+                PictureBoxCell.SIZE,
+                PictureBoxCell.SIZE);
 
             graphics.DrawRectangle(pen, rect);
-            graphics.FillRectangle(SNAKE_HEAD_BRUSH, rect);
+            graphics.FillRectangle(Snake.HEAD_BRUSH, rect);
         }
 
-        public int snakeHeadI;
-        public int snakeHeadJ;
-        private IList<Rectangle> SnakeBody;
+        public void UpdateLayer() => Invalidate();
+
+        private Pen pen;
     }
 }

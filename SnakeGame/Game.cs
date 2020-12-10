@@ -1,20 +1,13 @@
 ﻿using SnakeGame.RadnomService;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace SnakeGame
 {
     public class Game
     {
-        public static Brush SNAKE_HEAD_BRUSH { get; } = Brushes.Aqua;
-        public static Brush SNAKE_BODY_BRUSH { get; } = Brushes.AliceBlue;
-        public static Brush EMPTY_CELL { get; } = Brushes.White;
-
-        public Timer Timer { get; private set; }
-
-        public GameFieldLayer GameFieldLayer { get; }
+        public PictureBoxCells PictureBoxCellsLayer { get; }
         public SnakeLayer SnakeLayer { get; }
 
         public Game(int fieldX, int fieldY)
@@ -23,11 +16,10 @@ namespace SnakeGame
             onPause = false;
             currentSnakeDirection = Keys.None;
 
-            GameFieldLayer = new GameFieldLayer(fieldX, fieldY);
-            SnakeLayer = new SnakeLayer(GameFieldLayer);
+            PictureBoxCellsLayer = new PictureBoxCells(fieldX, fieldY);
+            var middle = PictureBoxCells.COUNT_CELLS / 2;
+            SnakeLayer = new SnakeLayer(PictureBoxCellsLayer, middle, middle);
 
-            var GameFieldLayerMiddle = GameFieldLayer.COUNT_CELLS / 2;
-            SnakeLayer.MoveSnakeHeadTo(GameFieldLayerMiddle, GameFieldLayerMiddle);
             //GameField.UpdateTableField(middlePos, middlePos, ElementType.SnakeHead);
 
             //snakeHead = GameField.GetTableElement(middlePos, middlePos);
@@ -53,19 +45,13 @@ namespace SnakeGame
 
         private void InitTimer()
         {
-            Timer = new Timer();
-            Timer.Interval = 100;
-            Timer.Tick += MoveSnake;
+            timer = new Timer();
+            timer.Interval = 100;
+            timer.Tick += MoveSnake;
         }
 
         public void ArrowButtonClick(Keys key)
         {
-
-            //var middlePos = GameField.SIZE / 2;
-            //snakeHead = GameField.UpdateFieldElement(middlePos, middlePos, SNAKE_HEAD_BRUSH);
-            //UpdateHeadIndexes(middlePos, middlePos);
-            //GameField.Invalidate();
-
             clickedArrow = key;
             Debug.WriteLine("ARROW CLICKED: " + key.ToString());
 
@@ -84,21 +70,21 @@ namespace SnakeGame
         {
             Debug.WriteLine("SPACE KEY CLICKED!");
             onPause = !onPause;
-            Timer.Enabled = !onPause & isStarted;
+            timer.Enabled = !onPause & isStarted;
 
-            Debug.WriteLine("GAME " + (Timer.Enabled ? "PAUSED" : "RESUMED"));
+            Debug.WriteLine("GAME " + (timer.Enabled ? "PAUSED" : "RESUMED"));
         }
 
         private void StartGame()
         {
             Debug.WriteLine("GAME STARTED");
             isStarted = true;
-            Timer.Enabled = true;
+            timer.Enabled = true;
         }
 
         private void MoveSnake(object sender, EventArgs e)
         {
-            Timer.Enabled = false;
+            timer.Enabled = false;
 
             // Если нельзя идти в противоположную сторону
             currentSnakeDirection =
@@ -108,32 +94,35 @@ namespace SnakeGame
                 || currentSnakeDirection == Keys.Right && clickedArrow == Keys.Left
                 ? currentSnakeDirection
                 : clickedArrow;
-
             //currentSnakeDirection = clickedArrow; Если можно идти в противоположную сторону
+
+            var newSnakeHeadPosition = SnakeLayer.Snake.Head;
             switch (currentSnakeDirection)
             {
                 case Keys.Up:
-                    SnakeLayer.MoveSnakeHeadTo(--SnakeLayer.snakeHeadI, SnakeLayer.snakeHeadJ);
+                    newSnakeHeadPosition.Item1--;
                     break;
                 case Keys.Down:
-                    SnakeLayer.MoveSnakeHeadTo(++SnakeLayer.snakeHeadI, SnakeLayer.snakeHeadJ);
+                    newSnakeHeadPosition.Item1++;
                     break;
                 case Keys.Left:
-                    SnakeLayer.MoveSnakeHeadTo(SnakeLayer.snakeHeadI, --SnakeLayer.snakeHeadJ);
+                    newSnakeHeadPosition.Item2--;
                     break;
                 case Keys.Right:
-                    SnakeLayer.MoveSnakeHeadTo(SnakeLayer.snakeHeadI, ++SnakeLayer.snakeHeadJ);
+                    newSnakeHeadPosition.Item2++;
                     break;
             }
 
-            //if (currentSnakeDirection == Keys.Up && snakeHeadNewI < 0
-            //    || currentSnakeDirection == Keys.Down && snakeHeadNewI >= GameField.TableSize
-            //    || currentSnakeDirection == Keys.Left && snakeHeadNewJ < 0
-            //    || currentSnakeDirection == Keys.Right && snakeHeadNewJ >= GameField.TableSize)
-            //{
-            //    MessageBox.Show($"YOU LOSE! OUT OF { clickedArrow }");
-            //    return;
-            //}
+            if (CrashedIntoBorder(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2))
+            {
+                MessageBox.Show($"YOU ARE CRASHED {currentSnakeDirection} BORDER!!!");
+                return;
+            }
+
+
+            SnakeLayer.Snake.MoveTo(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
+            SnakeLayer.UpdateLayer();
+            //snakeLayer.MoveSnakeHeadTo(snakeHeadPosition.Item1, snakeHeadPosition.Item2);
 
             // TODO Попытаться придумать что-то с обновлением цвета ячейки по типу автоматически
             //if (currentSnakeLenght > 1)
@@ -147,7 +136,7 @@ namespace SnakeGame
             //        snakeBody[i].Type = ElementType.SnakeBodyPart;
             //        snakeBody[i].UpdateColor();
             //    }
-            Timer.Enabled = true;
+            timer.Enabled = true;
         }
 
         //GameField.UpdateFieldElementToBase(headI, headJ);
@@ -161,11 +150,17 @@ namespace SnakeGame
         //    Timer.Enabled = true;
         //}
 
+        private bool CrashedIntoBorder(int i, int j)
+            => currentSnakeDirection == Keys.Up && i < 0
+                || currentSnakeDirection == Keys.Down && i > PictureBoxCells.COUNT_CELLS - 1
+                || currentSnakeDirection == Keys.Left && j < 0
+                || currentSnakeDirection == Keys.Right && j > PictureBoxCells.COUNT_CELLS - 1;
 
-        private bool isStarted { get; set; }
-        private bool onPause { get; set; }
-        private Keys clickedArrow { get; set; }
-        private Keys currentSnakeDirection { get; set; }
+        private Timer timer;
+        private bool isStarted;
+        private bool onPause;
+        private Keys clickedArrow;
+        private Keys currentSnakeDirection;
 
         private readonly IRandomService randomService;
     }

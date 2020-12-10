@@ -2,16 +2,16 @@
 
 namespace SnakeGame
 {
-    public class RectangleWrapp
+    public class PictureBoxCell
     {
         public static int SIZE = 20;
 
-        public Brush CurrentBrush { get; set; }
+        public Brush Brush { get; set; }
         public Rectangle Rect { get; set; }
 
-        public RectangleWrapp(int i, int j)
+        public PictureBoxCell(int i, int j, Brush brush = null)
         {
-            CurrentBrush = Game.EMPTY_CELL;
+            Brush = brush ?? Brushes.White;
             var location = new Point(j * SIZE, i * SIZE);
             var size = new Size(SIZE, SIZE);
             Rect = new Rectangle(location, size);
