@@ -1,14 +1,14 @@
 ﻿using SnakeGame.RadnomService;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace SnakeGame
 {
     public class Game
     {
-        public PictureBoxCells PictureBoxCellsLayer { get; }
-        public SnakeLayer SnakeLayer { get; }
+        public GameLayer GameLayer { get; }
 
         public Game(int fieldX, int fieldY)
         {
@@ -16,9 +16,10 @@ namespace SnakeGame
             onPause = false;
             currentSnakeDirection = Keys.None;
 
-            PictureBoxCellsLayer = new PictureBoxCells(fieldX, fieldY);
-            var middle = PictureBoxCells.COUNT_CELLS / 2;
-            SnakeLayer = new SnakeLayer(PictureBoxCellsLayer, middle, middle);
+            GameLayer = new GameLayer(fieldX, fieldY);
+            var middleIndex = GameLayer.COUNT_CELLS / 2;
+            snake = new Snake(middleIndex, middleIndex);
+            GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
 
             //GameField.UpdateTableField(middlePos, middlePos, ElementType.SnakeHead);
 
@@ -96,7 +97,7 @@ namespace SnakeGame
                 : clickedArrow;
             //currentSnakeDirection = clickedArrow; Если можно идти в противоположную сторону
 
-            var newSnakeHeadPosition = SnakeLayer.Snake.Head;
+            var newSnakeHeadPosition = snake.HeadIndexes;
             switch (currentSnakeDirection)
             {
                 case Keys.Up:
@@ -119,9 +120,13 @@ namespace SnakeGame
                 return;
             }
 
+            MoveSnakeBody();
+            GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = GameCell.EMPTY_CELL;
+            snake.HeadIndexes = newSnakeHeadPosition;
+            GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
 
-            SnakeLayer.Snake.MoveTo(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
-            SnakeLayer.UpdateLayer();
+            //SnakeLayer.Snake.MoveTo(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
+            //SnakeLayer.UpdateLayer();
             //snakeLayer.MoveSnakeHeadTo(snakeHeadPosition.Item1, snakeHeadPosition.Item2);
 
             // TODO Попытаться придумать что-то с обновлением цвета ячейки по типу автоматически
@@ -136,6 +141,8 @@ namespace SnakeGame
             //        snakeBody[i].Type = ElementType.SnakeBodyPart;
             //        snakeBody[i].UpdateColor();
             //    }
+
+            GameLayer.Refresh();
             timer.Enabled = true;
         }
 
@@ -152,15 +159,24 @@ namespace SnakeGame
 
         private bool CrashedIntoBorder(int i, int j)
             => currentSnakeDirection == Keys.Up && i < 0
-                || currentSnakeDirection == Keys.Down && i > PictureBoxCells.COUNT_CELLS - 1
+                || currentSnakeDirection == Keys.Down && i > GameLayer.COUNT_CELLS - 1
                 || currentSnakeDirection == Keys.Left && j < 0
-                || currentSnakeDirection == Keys.Right && j > PictureBoxCells.COUNT_CELLS - 1;
+                || currentSnakeDirection == Keys.Right && j > GameLayer.COUNT_CELLS - 1;
+
+        private void MoveSnakeBody()
+        {
+            if (snake.BodyIndexes.Count < 1)
+            {
+                return;
+            }
+        }
 
         private Timer timer;
         private bool isStarted;
         private bool onPause;
         private Keys clickedArrow;
         private Keys currentSnakeDirection;
+        private Snake snake;
 
         private readonly IRandomService randomService;
     }

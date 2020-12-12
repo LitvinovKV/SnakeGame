@@ -53,18 +53,13 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Game.cs" />
-    <Compile Include="PictureBoxCells.cs">
+    <Compile Include="GameLayer.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RadnomService\IRandomService.cs" />
     <Compile Include="RadnomService\RandomService.cs" />
-    <Compile Include="PictureBoxCell.cs" />
-    <Compile Include="Snake.cs" />
-    <Compile Include="SnakeLayer.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
