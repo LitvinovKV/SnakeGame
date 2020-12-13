@@ -1,7 +1,6 @@
 ﻿using SnakeGame.RadnomService;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace SnakeGame
@@ -21,25 +20,9 @@ namespace SnakeGame
             snake = new Snake(middleIndex, middleIndex);
             GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
 
-            //GameField.UpdateTableField(middlePos, middlePos, ElementType.SnakeHead);
-
-            //snakeHead = GameField.GetTableElement(middlePos, middlePos);
-
-            //snakeBody = new ElementBase[GameField.TableSize * GameField.TableSize];
-            //snakeBody[0] = snakeHead;
-            //currentSnakeLenght++;
-
-            //GameField.UpdateTableField(middlePos + currentSnakeLenght, middlePos, ElementType.SnakeBodyPart);
-            //snakeBody[currentSnakeLenght] = GameField.GetTableElement(middlePos + currentSnakeLenght, middlePos);
-            //currentSnakeLenght++;
-
-            //GameField.UpdateTableField(middlePos + currentSnakeLenght, middlePos, ElementType.SnakeBodyPart);
-            //snakeBody[currentSnakeLenght] = GameField.GetTableElement(middlePos + currentSnakeLenght, middlePos);
-            //currentSnakeLenght++;
-
-            //GameField.UpdateTableField(middlePos + currentSnakeLenght, middlePos, ElementType.SnakeBodyPart);
-            //snakeBody[currentSnakeLenght] = GameField.GetTableElement(middlePos + currentSnakeLenght, middlePos);
-            //currentSnakeLenght++;
+            IncreaseSnake(middleIndex + 1, middleIndex);
+            IncreaseSnake(middleIndex + 2, middleIndex);
+            IncreaseSnake(middleIndex + 3, middleIndex);
 
             InitTimer();
         }
@@ -120,10 +103,7 @@ namespace SnakeGame
                 return;
             }
 
-            MoveSnakeBody();
-            GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = GameCell.EMPTY_CELL;
-            snake.HeadIndexes = newSnakeHeadPosition;
-            GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
+            UpdateSnakeCells(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
 
             //SnakeLayer.Snake.MoveTo(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
             //SnakeLayer.UpdateLayer();
@@ -163,12 +143,35 @@ namespace SnakeGame
                 || currentSnakeDirection == Keys.Left && j < 0
                 || currentSnakeDirection == Keys.Right && j > GameLayer.COUNT_CELLS - 1;
 
-        private void MoveSnakeBody()
+        private void UpdateSnakeCells(int newSnakeHeadI, int newSnakeHeadJ)
         {
-            if (snake.BodyIndexes.Count < 1)
+            if (snake.CurrentLength == 0)
             {
-                return;
+                GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = GameCell.EMPTY_CELL;
             }
+            else
+            {
+
+                var lastBodyElement = snake.BodyIndexes[snake.CurrentLength - 1];
+                GameLayer[lastBodyElement.Item1, lastBodyElement.Item2].Brush = GameCell.EMPTY_CELL;
+
+                for (var i = snake.CurrentLength - 1; i > 0; i--)
+                {
+                    snake.BodyIndexes[i] = snake.BodyIndexes[i - 1];
+                }
+
+                snake.BodyIndexes[0] = snake.HeadIndexes;
+                GameLayer[snake.BodyIndexes[0].Item1, snake.BodyIndexes[0].Item2].Brush = Snake.SNAKE_BODY_CELL;
+            }
+
+            snake.HeadIndexes = (newSnakeHeadI, newSnakeHeadJ);
+            GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
+        }
+
+        private void IncreaseSnake(int i, int j)
+        {
+            snake.IncreaseBody(i, j);
+            GameLayer[i, j].Brush = Snake.SNAKE_BODY_CELL;
         }
 
         private Timer timer;

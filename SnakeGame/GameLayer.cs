@@ -86,15 +86,23 @@ namespace SnakeGame
     public class Snake
     {
         public static Brush SNAKE_HEAD_CELL = Brushes.DarkKhaki;
-        public static Brush SNAKE_BODY_CELL = Brushes.Honeydew;
+        public static Brush SNAKE_BODY_CELL = Brushes.LightGreen;
 
         public ValueTuple<int, int> HeadIndexes { get; set; }
-        public IList<ValueTuple<int, int>> BodyIndexes { get; set; }
+        public  ValueTuple<int, int>[] BodyIndexes { get; set; }
+        public int CurrentLength { get; set; }
 
         public Snake(int i, int j)
         {
             HeadIndexes = (i, j);
-            BodyIndexes = new List<ValueTuple<int, int>>();
+            BodyIndexes = new ValueTuple<int, int>[GameLayer.COUNT_CELLS * GameLayer.COUNT_CELLS];
+            CurrentLength = 0;
+        }
+
+        public void IncreaseBody(int i, int j)
+        {
+            BodyIndexes[CurrentLength] = (i, j);
+            CurrentLength++;
         }
     }
 }
