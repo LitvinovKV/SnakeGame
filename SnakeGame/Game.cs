@@ -1,6 +1,7 @@
 ﻿using SnakeGame.RadnomService;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace SnakeGame
@@ -9,8 +10,10 @@ namespace SnakeGame
     {
         public GameLayer GameLayer { get; }
 
-        public Game(int fieldX, int fieldY)
+        public Game(int fieldX, int fieldY, IRandomService randomService)
         {
+            this.randomService = randomService;
+
             isStarted = false;
             onPause = false;
             currentSnakeDirection = Keys.None;
@@ -23,6 +26,12 @@ namespace SnakeGame
             IncreaseSnake(middleIndex + 1, middleIndex);
             IncreaseSnake(middleIndex + 2, middleIndex);
             IncreaseSnake(middleIndex + 3, middleIndex);
+
+            var randomIndexes = randomService.GenerateIndexesExpect(GameLayer.GetTableIndexesLikeOnedimensionalArray(), snake.BodyIndexes);
+            if (randomIndexes != null)
+            {
+                GameLayer[randomIndexes.Value.Item1, randomIndexes.Value.Item2].Brush = Brushes.MediumSeaGreen;
+            }
 
             InitTimer();
         }
@@ -154,14 +163,8 @@ namespace SnakeGame
 
                 var lastBodyElement = snake.BodyIndexes[snake.CurrentLength - 1];
                 GameLayer[lastBodyElement.Item1, lastBodyElement.Item2].Brush = GameCell.EMPTY_CELL;
-
-                for (var i = snake.CurrentLength - 1; i > 0; i--)
-                {
-                    snake.BodyIndexes[i] = snake.BodyIndexes[i - 1];
-                }
-
-                snake.BodyIndexes[0] = snake.HeadIndexes;
-                GameLayer[snake.BodyIndexes[0].Item1, snake.BodyIndexes[0].Item2].Brush = Snake.SNAKE_BODY_CELL;
+                snake.Move();
+                GameLayer[snake.BodyIndexes[1].Item1, snake.BodyIndexes[1].Item2].Brush = Snake.SNAKE_BODY_CELL;
             }
 
             snake.HeadIndexes = (newSnakeHeadI, newSnakeHeadJ);

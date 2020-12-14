@@ -1,4 +1,5 @@
 ﻿
+using SnakeGame.RadnomService;
 using System.Drawing;
 
 namespace SnakeGame
@@ -35,7 +36,7 @@ namespace SnakeGame
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            game = new Game(12, 12);
+            game = new Game(12, 12, new RandomService());
             this.SuspendLayout();
             // 
             // label1

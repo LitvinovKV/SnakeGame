@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 
 namespace SnakeGame.RadnomService
 {
     public interface IRandomService
     {
+        (int, int)? GenerateIndexesExpect(IEnumerable<(int, int)> set1, IEnumerable<(int, int)> set2);
     }
 }
