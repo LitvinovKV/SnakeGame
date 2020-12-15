@@ -16,22 +16,13 @@ namespace SnakeGame
 
             isStarted = false;
             onPause = false;
-            currentSnakeDirection = Keys.None;
 
             GameLayer = new GameLayer(fieldX, fieldY);
             var middleIndex = GameLayer.COUNT_CELLS / 2;
             snake = new Snake(middleIndex, middleIndex);
             GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
 
-            IncreaseSnake(middleIndex + 1, middleIndex);
-            IncreaseSnake(middleIndex + 2, middleIndex);
-            IncreaseSnake(middleIndex + 3, middleIndex);
-
-            var randomIndexes = randomService.GenerateIndexesExpect(GameLayer.GetTableIndexesLikeOnedimensionalArray(), snake.BodyIndexes);
-            if (randomIndexes != null)
-            {
-                GameLayer[randomIndexes.Value.Item1, randomIndexes.Value.Item2].Brush = Brushes.MediumSeaGreen;
-            }
+            pointCell = GeneratePointCell();
 
             InitTimer();
         }
@@ -80,109 +71,97 @@ namespace SnakeGame
             timer.Enabled = false;
 
             // Если нельзя идти в противоположную сторону
-            currentSnakeDirection =
-                currentSnakeDirection == Keys.Up && clickedArrow == Keys.Down
-                || currentSnakeDirection == Keys.Down && clickedArrow == Keys.Up
-                || currentSnakeDirection == Keys.Left && clickedArrow == Keys.Right
-                || currentSnakeDirection == Keys.Right && clickedArrow == Keys.Left
-                ? currentSnakeDirection
+            snake.Direction =
+                snake.Direction == Keys.Up && clickedArrow == Keys.Down
+                || snake.Direction == Keys.Down && clickedArrow == Keys.Up
+                || snake.Direction == Keys.Left && clickedArrow == Keys.Right
+                || snake.Direction == Keys.Right && clickedArrow == Keys.Left
+                ? snake.Direction
                 : clickedArrow;
             //currentSnakeDirection = clickedArrow; Если можно идти в противоположную сторону
 
-            var newSnakeHeadPosition = snake.HeadIndexes;
-            switch (currentSnakeDirection)
-            {
-                case Keys.Up:
-                    newSnakeHeadPosition.Item1--;
-                    break;
-                case Keys.Down:
-                    newSnakeHeadPosition.Item1++;
-                    break;
-                case Keys.Left:
-                    newSnakeHeadPosition.Item2--;
-                    break;
-                case Keys.Right:
-                    newSnakeHeadPosition.Item2++;
-                    break;
-            }
+            var newSnakeHeadPosition = GetNewSnakePosition(snake.Direction, snake.HeadIndexes);
 
             if (CrashedIntoBorder(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2))
             {
-                MessageBox.Show($"YOU ARE CRASHED {currentSnakeDirection} BORDER!!!");
+                MessageBox.Show($"YOU ARE CRASHED {snake.Direction} BORDER!!!");
                 return;
             }
 
-            UpdateSnakeCells(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
+            if (newSnakeHeadPosition == pointCell.Position)
+            {
+                snake.Increase(newSnakeHeadPosition);
+                pointCell = GeneratePointCell();
+            }
+            else
+            {
+                var prevTailPosition = snake.Move(newSnakeHeadPosition);
+                GameLayer[prevTailPosition.Item1, prevTailPosition.Item2].Brush = GameCell.EMPTY_CELL;
+            }
 
-            //SnakeLayer.Snake.MoveTo(newSnakeHeadPosition.Item1, newSnakeHeadPosition.Item2);
-            //SnakeLayer.UpdateLayer();
-            //snakeLayer.MoveSnakeHeadTo(snakeHeadPosition.Item1, snakeHeadPosition.Item2);
-
-            // TODO Попытаться придумать что-то с обновлением цвета ячейки по типу автоматически
-            //if (currentSnakeLenght > 1)
-            //{
-            //    snakeBody[currentSnakeLenght - 1].Type = ElementType.BaseField;
-            //    snakeBody[currentSnakeLenght - 1].UpdateColor();
-
-            //    for (var i = currentSnakeLenght - 1; i >= 1; i--)
-            //    {
-            //        snakeBody[i] = snakeBody[i - 1];
-            //        snakeBody[i].Type = ElementType.SnakeBodyPart;
-            //        snakeBody[i].UpdateColor();
-            //    }
+            UpdateSnakeCells();
 
             GameLayer.Refresh();
             timer.Enabled = true;
         }
+        
+        private (int, int) GetNewSnakePosition(Keys snakeDirection, (int, int) snakeHeadPosition)
+        {
+            switch (snakeDirection)
+            {
+                case Keys.Up:
+                    snakeHeadPosition.Item1--;
+                    break;
+                case Keys.Down:
+                    snakeHeadPosition.Item1++;
+                    break;
+                case Keys.Left:
+                    snakeHeadPosition.Item2--;
+                    break;
+                case Keys.Right:
+                    snakeHeadPosition.Item2++;
+                    break;
+            }
 
-        //GameField.UpdateFieldElementToBase(headI, headJ);
-        //snakeHead = GameField.UpdateFieldElement(snakeHeadNewI, snakeHeadNewJ, SNAKE_HEAD_BRUSH);
-
-        //snakeHead = GameField.UpdateTableField(snakeHead, snakeHeadNewI, snakeHeadNewJ);
-        //snakeHead.Type = ElementType.SnakeHead;
-        //snakeHead.UpdateColor();
-        //snakeBody[0] = snakeHead;
-
-        //    Timer.Enabled = true;
-        //}
+            return snakeHeadPosition;
+        }
 
         private bool CrashedIntoBorder(int i, int j)
-            => currentSnakeDirection == Keys.Up && i < 0
-                || currentSnakeDirection == Keys.Down && i > GameLayer.COUNT_CELLS - 1
-                || currentSnakeDirection == Keys.Left && j < 0
-                || currentSnakeDirection == Keys.Right && j > GameLayer.COUNT_CELLS - 1;
+            => snake.Direction == Keys.Up && i < 0
+                || snake.Direction == Keys.Down && i > GameLayer.COUNT_CELLS - 1
+                || snake.Direction == Keys.Left && j < 0
+                || snake.Direction == Keys.Right && j > GameLayer.COUNT_CELLS - 1;
 
-        private void UpdateSnakeCells(int newSnakeHeadI, int newSnakeHeadJ)
-        {
-            if (snake.CurrentLength == 0)
+        private void UpdateSnakeCells()
+        {   
+            if (snake.CurrentLength > 1)
             {
-                GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = GameCell.EMPTY_CELL;
-            }
-            else
-            {
-
-                var lastBodyElement = snake.BodyIndexes[snake.CurrentLength - 1];
-                GameLayer[lastBodyElement.Item1, lastBodyElement.Item2].Brush = GameCell.EMPTY_CELL;
-                snake.Move();
                 GameLayer[snake.BodyIndexes[1].Item1, snake.BodyIndexes[1].Item2].Brush = Snake.SNAKE_BODY_CELL;
             }
 
-            snake.HeadIndexes = (newSnakeHeadI, newSnakeHeadJ);
             GameLayer[snake.HeadIndexes.Item1, snake.HeadIndexes.Item2].Brush = Snake.SNAKE_HEAD_CELL;
         }
 
-        private void IncreaseSnake(int i, int j)
+        private GameCell GeneratePointCell()
         {
-            snake.IncreaseBody(i, j);
-            GameLayer[i, j].Brush = Snake.SNAKE_BODY_CELL;
+            var randomIndexes = randomService.GenerateIndexesExpect(GameLayer.GetTableIndexesLikeOnedimensionalArray(), snake.BodyIndexes);
+            
+            if (randomIndexes == null)
+            {
+                return null;
+            }
+
+            var gameCell = GameLayer[randomIndexes.Value.Item1, randomIndexes.Value.Item2];
+            gameCell.Brush = Brushes.MediumSeaGreen;
+            return gameCell;
         }
 
         private Timer timer;
         private bool isStarted;
         private bool onPause;
         private Keys clickedArrow;
-        private Keys currentSnakeDirection;
         private Snake snake;
+        private GameCell pointCell;
 
         private readonly IRandomService randomService;
     }

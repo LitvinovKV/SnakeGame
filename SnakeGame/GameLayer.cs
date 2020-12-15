@@ -113,33 +113,57 @@ namespace SnakeGame
         }
         public  ValueTuple<int, int>[] BodyIndexes { get; set; }
         public int CurrentLength { get; set; }
+        public Keys Direction { get; set; }
 
         public Snake(int i, int j)
         { 
             BodyIndexes = new ValueTuple<int, int>[GameLayer.COUNT_CELLS * GameLayer.COUNT_CELLS];
             HeadIndexes = (i, j);
             CurrentLength = 1;
+            Direction = Keys.None;
         }
 
-        public void IncreaseBody(int i, int j)
+        public (int, int) Move((int, int) newHeadPosition)
         {
-            BodyIndexes[CurrentLength] = (i, j);
+            var shouldClearCellPosition = BodyIndexes[CurrentLength - 1];
+            
+            if (CurrentLength > 1)
+            {
+                for (var i = CurrentLength - 1; i > 1; i--)
+                {
+                    BodyIndexes[i] = BodyIndexes[i - 1];
+                }
+
+                BodyIndexes[1] = HeadIndexes;
+            }
+
+            BodyIndexes[0] = (newHeadPosition.Item1, newHeadPosition.Item2);
+
+            return shouldClearCellPosition;
+        }
+
+        public void Increase((int, int) newHeadPosition)
+        {
+            var prevTailPosition = Move(newHeadPosition);
+
+            if (prevTailPosition.Item1 < BodyIndexes[CurrentLength - 1].Item1)
+            {
+                BodyIndexes[CurrentLength] = (BodyIndexes[CurrentLength - 1].Item1 - 1, BodyIndexes[CurrentLength - 1].Item2);
+            }
+            else if (prevTailPosition.Item1 > BodyIndexes[CurrentLength - 1].Item1)
+            {
+                BodyIndexes[CurrentLength] = (BodyIndexes[CurrentLength - 1].Item1 + 1, BodyIndexes[CurrentLength - 1].Item2);
+            }
+            else if (prevTailPosition.Item2 < BodyIndexes[CurrentLength - 1].Item2)
+            {
+                BodyIndexes[CurrentLength] = (BodyIndexes[CurrentLength - 1].Item1, BodyIndexes[CurrentLength - 1].Item2 - 1);
+            }
+            else if (prevTailPosition.Item2 > BodyIndexes[CurrentLength - 1].Item2)
+            {
+                BodyIndexes[CurrentLength] = (BodyIndexes[CurrentLength - 1].Item1, BodyIndexes[CurrentLength - 1].Item2 + 1);
+            }
+
             CurrentLength++;
-        }
-
-        public void Move()
-        {
-            if (CurrentLength <= 1)
-            {
-                return;
-            }
-
-            for (var i = CurrentLength - 1; i > 1; i--)
-            {
-                BodyIndexes[i] = BodyIndexes[i - 1];
-            }
-
-            BodyIndexes[1] = HeadIndexes;
         }
     }
 }
